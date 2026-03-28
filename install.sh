@@ -2,7 +2,7 @@
 set -euo pipefail
 trap 'echo "operation is interrupted"; exit 130' INT
 
-REPO_URL="https://github.com/driverdrift/yt-dlp-web/archive/main.tar.gz"
+REPO_URL="https://github.com/botshell/downloader/archive/main.tar.gz"
 WORKDIR="/tmp/yt-dlp-web"
 
 rm -rf "$WORKDIR" && mkdir -p "$WORKDIR"
