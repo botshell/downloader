@@ -114,17 +114,29 @@ if (!file_exists($cacheDir)) mkdir($cacheDir, 0777, true);
 // $externalDownloaderArgs = "--downloader aria2c --downloader-args \"aria2c:-x 8 -s 8 -k 1M\"";
 $commonArgs = "-N 32 --concurrent-fragments 32 --js-runtimes node --no-playlist --no-mtime --cache-dir " . escapeshellarg($cacheDir) .
     " --cookies " . escapeshellarg($cookiesFile);
+
+$proxy = "socks5://127.0.0.1:10808";
+
 if ($audioOnly) {
-    $cmd = "$ytDlpPath -x --audio-format mp3 $commonArgs -o " . escapeshellarg($outputTemplate) . " $url_esc";
+    $cmd_direct = "$ytDlpPath -x --audio-format mp3 $commonArgs -o " . escapeshellarg($outputTemplate) . " $url_esc";
+    $cmd_proxy  = "$ytDlpPath -x --audio-format mp3 $commonArgs --proxy $proxy -o " . escapeshellarg($outputTemplate) . " $url_esc";
 } else {
-    $cmd = "$ytDlpPath $commonArgs -o " . escapeshellarg($outputTemplate) . " $url_esc";
+    $cmd_direct = "$ytDlpPath $commonArgs -o " . escapeshellarg($outputTemplate) . " $url_esc";
+    $cmd_proxy  = "$ytDlpPath $commonArgs --proxy $proxy -o " . escapeshellarg($outputTemplate) . " $url_esc";
 }
 
 $logFile = $outputDir . $uuid . '.log';
 $taskFile = $outputDir . $uuid . '.json';
 
-// 后台执行命令，输出到日志文件，& 让进程后台运行，echo $! 输出进程PID
-$fullCmd = "$cmd > " . escapeshellarg($logFile) . " 2>&1 & echo $!";
+// 逻辑：先直连，失败再用代理
+$fullCmd = "(
+    echo '=== Direct download ===';
+    $cmd_direct;
+    if [ $? -ne 0 ]; then
+        echo '=== Retry with proxy ===';
+        $cmd_proxy;
+    fi
+) > " . escapeshellarg($logFile) . " 2>&1 & echo $!";
 
 $pid = (int)shell_exec($fullCmd);
 
