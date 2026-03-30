@@ -23,11 +23,11 @@ apt-get install python3-pycryptodome nodejs -y >/dev/null
 # This issue is common—PHP processes (usually run as www-data) have limited permissions and environment variables.
 # They typically can't access yt-dlp in your user directory (~/.local/bin).
 # By default, home directories often have 700 permissions, blocking access for other users.
-mkdir -p /var/www/yt-dlp
+mkdir -p /var/www/downloader
 # Use the "get-cookiestxt-locally" browser extension to export cookies for YouTube and Bilibili.
-# Then upload the exported file to: /var/www/yt-dlp/cookies.txt
+# Then upload the exported file to: /var/www/downloader/cookies.txt
 # sftp vps-1
-# put "path\to\cookies.txt" "/var/www/yt-dlp"
+# put "path\to\cookies.txt" "/var/www/downloader"
 # Cookie handling policy:
 # Do NOT manually create an empty cookies.txt file. In normal cases, do not upload cookies at all.
 # If cookies.txt does not exist, yt-dlp will automatically create a valid Netscape-format cookies 
@@ -78,10 +78,10 @@ mkdir -p /var/www/yt-dlp
 # Never create an empty cookies.txt file. An empty file fails format validation
 # and also prevents yt-dlp from generating a valid cookies file automatically.
 
-cp "./download.html" "/var/www/yt-dlp"
-cp "./download.php" "/var/www/yt-dlp"
+cp "./download.html" "/var/www/downloader"
+cp "./download.php" "/var/www/downloader"
 
-chown -R www-data:www-data "/var/www/yt-dlp"
+chown -R www-data:www-data "/var/www/downloader"
 # tail -f /var/log/nginx/example.com.error.log  # debug
 # Access the site to download videos:
 # https://domain.com/yt-dlp/download.html
